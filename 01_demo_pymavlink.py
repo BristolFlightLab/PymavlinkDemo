@@ -1,9 +1,9 @@
 import time
 from pymavlink import mavutil
 
-master = mavutil.mavlink_connection("tcp:127.0.0.1:14550",source_system=255,source_component=5)
+connection = mavutil.mavlink_connection("tcp:127.0.0.1:14550",source_system=255,source_component=5)
 
-master.wait_heartbeat()
+connection.wait_heartbeat()
 print("Got heartbeat")    
 
 # Set mode to GUIDED
@@ -12,7 +12,7 @@ print("Got heartbeat")
 def get_custom_mode_number(mode):
     custom_mode_number = None
     # For ArduCopter, we use mode_mapping_acm, differs for ArduPlane or PX4
-    # master.mode_mapping() should return the mapping needed
+    # connection.mode_mapping() should return the mapping needed
     for (number,mode_string) in mavutil.mode_mapping_acm.items():
         if mode_string == mode:
             custom_mode_number = number
@@ -39,10 +39,10 @@ set_mode_message = mavutil.mavlink.MAVLink_command_long_message(
 )
 
 # Send set mode message
-master.mav.send(set_mode_message)
+connection.mav.send(set_mode_message)
 
 # Check that our DO_SET_MODE command was successful
-msg = master.recv_match(type="COMMAND_ACK",blocking=True)
+msg = connection.recv_match(type="COMMAND_ACK",blocking=True)
 print(msg)
 if msg.result != mavutil.mavlink.MAV_RESULT_ACCEPTED:
     print("Error setting mode")
@@ -54,7 +54,7 @@ def send_command(command,confirmation,param1=0,param2=0,param3=0,param4=0,param5
     """
     Send a COMMAND_LONG message to (sys,comp) = (1,1)
     """
-    master.mav.command_long_send(
+    connection.mav.command_long_send(
         1,1,
         command,
         confirmation,
@@ -78,7 +78,7 @@ send_command(
     )
 
 # Check if arming was successful
-msg = master.recv_match(type="COMMAND_ACK",blocking=True)
+msg = connection.recv_match(type="COMMAND_ACK",blocking=True)
 print(msg)
 if msg.result != mavutil.mavlink.MAV_RESULT_ACCEPTED:
     print("Error arming vehicle")
@@ -92,16 +92,16 @@ send_command(
     )
 
 # Check we sucessfully sent takeoff
-msg = master.recv_match(type="COMMAND_ACK",blocking=True)
+msg = connection.recv_match(type="COMMAND_ACK",blocking=True)
 print(msg)
 if msg.result != mavutil.mavlink.MAV_RESULT_ACCEPTED:
     print("Error sending takeoff command")
     exit()
 
 # Wait for us to get to somewhere near 20m
-msg = master.recv_match(type="GLOBAL_POSITION_INT",blocking=True)
+msg = connection.recv_match(type="GLOBAL_POSITION_INT",blocking=True)
 while abs(20000 - msg.relative_alt) > 500: # Alt in mm
-    msg = master.recv_match(type="GLOBAL_POSITION_INT",blocking=True)
+    msg = connection.recv_match(type="GLOBAL_POSITION_INT",blocking=True)
 
 print("Takeoff complete")
 
@@ -121,7 +121,7 @@ ignore_accel = (mavutil.mavlink.POSITION_TARGET_TYPEMASK_AX_IGNORE
     )
 
 # Send a position target
-master.mav.set_position_target_global_int_send(
+connection.mav.set_position_target_global_int_send(
     time_pair[1]+int(round((time.time()-time_pair[0])*1000)),
     1,
     1,
@@ -141,7 +141,7 @@ time.sleep(0.5)
 exit()
 
 def set_position(lat,lng,alt):
-    master.mav.set_position_target_global_int_send(
+    connection.mav.set_position_target_global_int_send(
         time_pair[1]+int(round((time.time()-time_pair[0])*1000)),
         1,
         1,

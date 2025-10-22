@@ -166,8 +166,8 @@ be executed immediately. We will type a few lines to test our connection:
 
 ```python
 >>> from pymavlink import mavutil
->>> master = mavutil.mavlink_connection("tcp:127.0.0.1:14550")
->>> master.recv_msg()
+>>> connection = mavutil.mavlink_connection("tcp:127.0.0.1:14550")
+>>> connection.recv_msg()
 ```
 
 You should see that a message object has been received. The exact type will differ depending on the most recently received message.

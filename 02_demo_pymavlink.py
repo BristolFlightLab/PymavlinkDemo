@@ -1,18 +1,18 @@
 import time
 from pymavlink import mavutil
 
-master = mavutil.mavlink_connection("tcp:127.0.0.1:14550",source_system=255,source_component=5)
+connection = mavutil.mavlink_connection("tcp:127.0.0.1:14550",source_system=255,source_component=5)
 
-master.wait_heartbeat()
+connection.wait_heartbeat()
 print("Got heartbeat")
 
 def send_command(command,confirmation,param1=0,param2=0,param3=0,param4=0,param5=0,param6=0,param7=0):
     """
     Send a COMMAND_LONG message to (sys,comp) = (1,1)
     """
-    master.mav.command_long_send(
-        master.target_system,
-        master.target_component,
+    connection.mav.command_long_send(
+        connection.target_system,
+        connection.target_component,
         command,
         confirmation,
         param1,
@@ -25,35 +25,35 @@ def send_command(command,confirmation,param1=0,param2=0,param3=0,param4=0,param5
         )  
 
 # Set mode to GUIDED
-master.set_mode("GUIDED")
+connection.set_mode("GUIDED")
 
 # Check that mode change was successful
-while master.flightmode != "GUIDED":
+while connection.flightmode != "GUIDED":
     print("Waiting for flightmode change")
-    master.wait_heartbeat()
+    connection.wait_heartbeat()
 
 # Arm the vehicle
-master.arducopter_arm()
-master.motors_armed_wait()
+connection.arducopter_arm()
+connection.motors_armed_wait()
 
 # Command takeoff to 20m
 send_command(mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,0,param7=20)
 
 # Check we sucessfully sent takeoff
-msg = master.recv_match(type="COMMAND_ACK",blocking=True)
+msg = connection.recv_match(type="COMMAND_ACK",blocking=True)
 print(msg)
 if msg.result != mavutil.mavlink.MAV_RESULT_ACCEPTED:
     print("Error sending takeoff command")
     exit()
 
 # Wait for us to get to somewhere near 20m
-while abs(20 - master.location(relative_alt=True).alt) > 0.5: # Alt in m
+while abs(20 - connection.location(relative_alt=True).alt) > 0.5: # Alt in m
     pass
 
 print("Takeoff complete")
 
 # Get current system time
-system_time = master.recv_match(type="SYSTEM_TIME",blocking=True)
+system_time = connection.recv_match(type="SYSTEM_TIME",blocking=True)
 time_pair = (time.time(), system_time.time_boot_ms)
 
 # Setup the bitfields to tell the vehicle to ignore velocity and accelerations
@@ -69,7 +69,7 @@ ignore_accel = (mavutil.mavlink.POSITION_TARGET_TYPEMASK_AX_IGNORE
     )
 
 # Send a position target
-master.mav.set_position_target_global_int_send(
+connection.mav.set_position_target_global_int_send(
     time_pair[1]+int(round((time.time()-time_pair[0])*1000)),
     1,
     1,
@@ -89,7 +89,7 @@ time.sleep(0.5)
 exit()
 
 def set_position(lat,lng,alt):
-    master.mav.set_position_target_global_int_send(
+    connection.mav.set_position_target_global_int_send(
         time_pair[1]+int(round((time.time()-time_pair[0])*1000)),
         1,
         1,

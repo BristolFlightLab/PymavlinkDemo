@@ -138,22 +138,3 @@ connection.mav.set_position_target_global_int_send(
 
 print("Set intial position")
 time.sleep(0.5)
-exit()
-
-def set_position(lat,lng,alt):
-    connection.mav.set_position_target_global_int_send(
-        time_pair[1]+int(round((time.time()-time_pair[0])*1000)),
-        1,
-        1,
-        mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-        (ignore_velocity | ignore_accel),
-        int(lat*(10**7)), # Lat (degE7)
-        int(lng*(10**7)), # Long (degE7)
-        alt, # Altitude
-        0,0,0, # Velocities
-        0,0,0, # Accels
-        0, # Yaw
-        0 # Yaw rate
-        )
-
-set_position(51.425,-2.671,50)

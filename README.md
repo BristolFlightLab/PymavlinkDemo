@@ -159,7 +159,7 @@ Set the options in the dialog to the same as those in the screenshot, then press
 for the row you have just set up. The button should change to contain the text "Started". Once that's done you
 can close the Serial Output dialog and the `Ctrl+f` window.
 
-### 3. Test our connection is working
+### 4. Test our connection is working
 
 Back in PowerShell, type `python` to launch the standard Python prompt. Here you can type in lines of Python code to
 be executed immediately. We will type a few lines to test our connection:

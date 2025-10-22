@@ -1,21 +1,14 @@
-import time
 from pymavlink import mavutil
 
-master = mavutil.mavlink_connection("tcp:127.0.0.1:14550")
+# Connect to our simulator
+connection = mavutil.mavlink_connection("tcp:127.0.0.1:14550")
 
-master.wait_heartbeat()
-
-master.mav.command_long_send(
-    1,1,
-    mavutil.mavlink.MAV_CMD_DO_SET_MODE,
-    0,
-    mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
-    4,
-    0,
-    0,
-    0,
-    0,
-    0
-)
-
-time.sleep(0.5)
+while True:
+    # Receive next mavlink message
+    msg = connection.recv_msg()
+    # If no message, continue loop
+    if not msg:
+        continue
+    # If message type is HEARTBEAT, print it
+    if msg.get_type() == 'HEARTBEAT':
+        print(msg)

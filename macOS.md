@@ -21,6 +21,8 @@ A piece of software called Docker can be used to run the simulator. Docker can b
 from here:
 https://docs.docker.com/desktop/setup/install/mac-install/
 
+Once you have downloaded Docker, open the application to finsh the install process.
+
 Once you have Docker installed, open a Terminal window and run this command:
 ```console
 docker run -p 5761:5761 -p 14550:14550 -it orthuk/ardupilot-sitl ./Tools/autotest/sim_vehicle.py -v ArduCopter --frame quad --mavproxy-args '--out tcpin:0.0.0.0:5761 --out tcpin:0.0.0.0:14550' -l 51.4234178,-2.6715506,50,155
@@ -34,6 +36,10 @@ should be much quicker.
 Once the simulator is running, you should then be able to start up QGroundControl and connect to the
 simulator. If it doesn't connect automatically, you will need to set it up to connect to
 TCP:127.0.0.1:5761. See the section below
+
+> NB: The first time you open QGC, there will be some initial setup screens about measurement units
+> and vehicle information. Change these if you want. Setting the vehicle to MultiRotor is a good idea
+> initially.
 
 ### Connecting QGroundControl to the simulator
 
@@ -50,16 +56,23 @@ The first stage is to set up the connection to use:
 With the connection set up, use it to connect to the simulator:
 - Navigate to the "Comm Links" screen (Q-icon, Application Setting, Comm Links)
 - Click the new "TCP5761" connection to select it
-- Click "Connect" at the bottom of the screen
+- Click "Connect" next to the newly-added connection
 
 Clicking the paper plane icon at the top-left of the screen should get you back to the map view.
+
+## Installing Python
+
+macOS might already have Python installed. Run `python3 --version` in a Terminal window
+to check. The exact version does not matter too much.
+
+If it is not installed, follow the instructions here to install Python:
+
+https://docs.python-guide.org/starting/install3/osx/
+
 
 ## Creating a virtual environment for the project
 
 There are a few differences in setting up the virtual environment on macOS:
-
-Firstly, macOS should already have Python installed. Run `python3 --version` in a Terminal window
-to check. The exact version does not matter too much.
 
 You should not need to change directory (`cd`) on macOS, you should already be in your local user (home) directory.
 
@@ -124,6 +137,21 @@ docker run \                        # Tells Docker to run a container
     -l 51.4234178,-2.6715506,50,155 # Sets the starting location for the simulator
 ```
 
-More information about the `sim_vehicle.py` script that is being run in the container can be found here:
+More information about the `sim_vehicle.py` script that is being run in the container can be found
+here:
 
 https://ardupilot.org/dev/docs/using-sitl-for-ardupilot-testing.html
+
+# Troubleshooting
+
+# Cannot start the simulator
+
+If Docker complains about ports still being open, it may be that an old copy of the simulator is still
+running in the background. Check for it on the Docker dashboard (Click the Docker icon on the menubar).
+Under containers, there should be a simulator container running which you can stop using the "stop"
+button.
+
+If that doesn't work, you can try using the command line to stop the container. Open a new Terminal window
+and run `docker ps`. It should show that there is a container running. Copy the name of the container (last
+column of the output) and run `docker kill CONTAINER_NAME` where `CONTAINER_NAME` is replaced with the name
+of the container you copied.

@@ -12,10 +12,11 @@ version of Python. Type the command below into the PowerShell window and press t
 the command.
 
 ```
-py install 3.13
+py install 3
 ```
 
-This should install Python 3.13. You can check that your Python installation works by typing the command:
+This should install the latest version of Python 3. You can check that your Python installation
+works by typing the command:
 ```ps1
 python --version
 ```
@@ -23,11 +24,8 @@ python --version
 This should result in otuptu similar to below. The last digit may differ if there have been updates
 to Python.
 ```
-Python 3.13.9
+Python 3.15.2
 ```
-
-> NB: Python 3.14 is available, but the `pymavlink` package does not yet have pre-built packages for
-> Windows so for now use Python 3.13
 
 ### 3. Create a virtual environment for the project
 
